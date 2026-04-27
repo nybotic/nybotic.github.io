@@ -31,14 +31,14 @@ a {
 }
 
 .page {
-  width: min(820px, calc(100% - 36px));
+  width: min(1080px, calc(100% - 36px));
   margin: 0 auto;
   padding: clamp(36px, 7vw, 78px) 0 34px;
 }
 
 .profile {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
+  grid-template-columns: 76px minmax(0, 1fr) auto;
   gap: 20px;
   align-items: center;
   padding: 22px;
@@ -122,18 +122,13 @@ h3 {
 }
 
 .stats {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
-  margin: 14px 0 36px;
-  max-width: 180px;
-}
-
-.stats div {
+  min-width: 132px;
+  margin: 0;
   border: 1px solid rgba(126, 167, 232, 0.14);
   border-radius: 12px;
-  padding: 14px;
+  padding: 14px 16px;
   background: rgba(19, 22, 29, 0.72);
+  justify-self: end;
 }
 
 dt {
@@ -162,6 +157,7 @@ dd {
 
 .repo-list {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -266,6 +262,13 @@ footer {
     grid-template-columns: 1fr;
   }
 
+  .stats {
+    justify-self: stretch;
+  }
+
+  .repo-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
