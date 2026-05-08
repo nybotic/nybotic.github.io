@@ -1,6 +1,9 @@
 const GITHUB_USER = "nybotic";
 const profileUrl = `https://api.github.com/users/${GITHUB_USER}`;
 const reposUrl = `${profileUrl}/repos?sort=updated&per_page=100`;
+const CACHE_KEY = "nybotic.github.io:github-data";
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 7500;
 
 const avatar = document.querySelector("#avatar");
 const profileName = document.querySelector("#profile-name");
@@ -138,6 +141,45 @@ function renderRepos(repos) {
   observeReveals();
 }
 
+function getCachedGithubData() {
+  try {
+    const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY));
+
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.data;
+    }
+  } catch (error) {
+    sessionStorage.removeItem(CACHE_KEY);
+  }
+
+  return null;
+}
+
+function setCachedGithubData(data) {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+      data,
+      expiresAt: Date.now() + CACHE_TTL_MS
+    }));
+  } catch (error) {
+    sessionStorage.removeItem(CACHE_KEY);
+  }
+}
+
+async function fetchJson(url) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  const response = await fetch(url, { signal: controller.signal })
+    .finally(() => clearTimeout(timeout));
+
+  if (!response.ok) {
+    throw new Error("GitHub request failed");
+  }
+
+  return response.json();
+}
+
 function observeReveals() {
   const revealElements = document.querySelectorAll(".reveal:not(.visible)");
 
@@ -163,19 +205,8 @@ function observeReveals() {
 
 async function loadGithub() {
   try {
-    const [profileResponse, reposResponse] = await Promise.all([
-      fetch(profileUrl),
-      fetch(reposUrl)
-    ]);
-
-    if (!profileResponse.ok || !reposResponse.ok) {
-      throw new Error("GitHub request failed");
-    }
-
-    const [profile, repos] = await Promise.all([
-      profileResponse.json(),
-      reposResponse.json()
-    ]);
+    const cached = getCachedGithubData();
+    const { profile, repos } = cached || await loadFreshGithubData();
 
     renderProfile(profile);
     renderRepos(repos.filter((repo) => !repo.fork && !repo.archived));
@@ -183,6 +214,17 @@ async function loadGithub() {
     renderProfile(fallbackProfile);
     renderRepos(fallbackRepos);
   }
+}
+
+async function loadFreshGithubData() {
+  const [profile, repos] = await Promise.all([
+    fetchJson(profileUrl),
+    fetchJson(reposUrl)
+  ]);
+  const data = { profile, repos };
+
+  setCachedGithubData(data);
+  return data;
 }
 
 loadGithub();

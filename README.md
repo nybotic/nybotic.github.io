@@ -1,27 +1,29 @@
 # nybotic.github.io
 
-Simple GitHub Pages site for my GitHub profile.
+Personal GitHub Pages site for [github.com/nybotic](https://github.com/nybotic).
 
-It shows my profile info and a list of my public repos with short notes about what each one does. The site is intentionally plain: dark theme, no framework, no build step.
+The site is intentionally simple: static HTML, CSS, and JavaScript with no framework or build step. It loads public GitHub profile and repository data from the GitHub API, then falls back to local placeholder content if the request fails.
+
+## Features
+
+- Displays profile information for the `nybotic` GitHub account.
+- Lists public, non-archived, non-fork repositories.
+- Adds short hand-written notes for known projects.
+- Caches GitHub API results in `sessionStorage` for faster repeat views.
+- Includes the DonutStats extension privacy policy page.
 
 ## Files
 
-- `index.html` - page structure
-- `styles.css` - dark theme and layout
-- `script.js` - loads profile/repo data from the GitHub API
-- `assets/` - local images
+- `index.html` - page structure.
+- `styles.css` - dark theme, responsive layout, and reveal animation.
+- `script.js` - GitHub API loading, caching, and repository rendering.
+- `donutstatsextension-privacy.html` - privacy policy for the browser extension.
+- `assets/` - local images.
 
-## Run locally
+## Run Locally
 
-Open `index.html` in a browser.
+Open `index.html` in a browser. No build command is needed.
 
-## Updating
+## Deploy
 
-After editing files:
-
-```powershell
-git status
-git add .
-git commit -m "Update site"
-git push
-```
+Push changes to the repository's default branch and GitHub Pages will serve the updated static files.
